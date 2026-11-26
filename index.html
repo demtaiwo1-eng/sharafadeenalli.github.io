@@ -2,25 +2,51 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#101827">
-<meta name="description" content="CampTech Oyo — public information, media monitoring and field operations workspace.">
-<title>CampTech | Oyo Public Information</title>
-<style>
-:root{color-scheme:dark;--bg:#0b1220;--panel:#131f32;--line:#26364d;--ink:#f3f6fb;--muted:#aab8ca;--cyan:#62d7df;--gold:#f4c66a}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0,#1b3550 0,transparent 42%),var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}
-a{color:var(--cyan)}.wrap{max-width:1160px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding:12px 0 22px}.brand{font-weight:800;letter-spacing:.08em}.brand span{color:var(--gold)}.tag{color:var(--muted);font-size:.88rem}.hero{padding:58px 0 34px;max-width:800px}.eyebrow{color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-size:.78rem}h1{font-size:clamp(2.2rem,6vw,4.3rem);line-height:1.05;margin:14px 0}h2{margin:0 0 8px;font-size:1.2rem}p{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:28px 0}.card{background:linear-gradient(145deg,#17263b,#101a2b);border:1px solid var(--line);border-radius:18px;padding:22px;min-height:165px}.card p{margin-bottom:0}.pill{display:inline-block;border:1px solid #3b586c;border-radius:99px;padding:5px 10px;color:var(--cyan);font-size:.78rem}.notice{border-left:3px solid var(--gold);padding:12px 16px;background:#182337;border-radius:0 10px 10px 0;color:var(--muted)}footer{border-top:1px solid var(--line);padding:22px 0;margin-top:42px;color:var(--muted);font-size:.85rem}
-</style>
+<meta name="theme-color" content="#101827"><meta name="description" content="CampTech Oyo — public information, media monitoring and field operations.">
+<title>CampTech Oyo | Information & Operations</title><link rel="stylesheet" href="styles.css">
 </head>
-<body><main class="wrap">
-<header class="top"><div><div class="brand">CAMP<span>TECH</span> OYO</div><div class="tag">Public information · Media intelligence · Field operations</div></div><span class="pill">Foundation preview</span></header>
-<section class="hero"><div class="eyebrow">Oyo State · Nigeria</div><h1>One trusted place for public information and coordinated action.</h1><p>CampTech is a proposed information and operations platform for collecting public updates, organising field reports, coordinating events and publishing verified information transparently.</p><div class="notice"><strong>Data status:</strong> This is the foundation interface. Live source feeds, user accounts, reporting APIs and operational data have not yet been connected. No figures shown here are presented as live results.</div></section>
-<section class="grid">
-<article class="card"><span class="pill">01 · Public</span><h2>Public information hub</h2><p>Publish dated announcements, explainers, event information and verified updates with clear source attribution.</p></article>
-<article class="card"><span class="pill">02 · Monitoring</span><h2>Open-source media monitoring</h2><p>Organise publicly available news and public posts by keyword, date, source and topic. Preserve links and collection timestamps.</p></article>
-<article class="card"><span class="pill">03 · Situation room</span><h2>Operations dashboard</h2><p>Track projects, tasks, milestones, assigned teams and issue status with role-based access and audit history.</p></article>
-<article class="card"><span class="pill">04 · Field</span><h2>Ward and field reporting</h2><p>Submit structured observations, event reports and service issues. Protect personal data and separate allegations from verified facts.</p></article>
-<article class="card"><span class="pill">05 · Events</span><h2>Events and stakeholders</h2><p>Coordinate schedules, venues, logistics, vendors, attendance counts and post-event reports.</p></article>
-<article class="card"><span class="pill">06 · Insights</span><h2>Reports and transparency</h2><p>Generate aggregate trend summaries, source coverage, project progress and downloadable public reports.</p></article>
+<body>
+<aside class="sidebar" id="sidebar">
+<a class="brand" href="#home"><span class="brand-mark">C</span><span>CAMPTECH<small>OYO STATE</small></span></a>
+<nav aria-label="Main navigation">
+<a class="nav-link active" href="#home" data-view="home">Overview</a>
+<a class="nav-link" href="#updates" data-view="updates">Public updates</a>
+<a class="nav-link" href="#monitoring" data-view="monitoring">Media monitor</a>
+<a class="nav-link" href="#operations" data-view="operations">Operations</a>
+<a class="nav-link" href="#field" data-view="field">Field report</a>
+</nav>
+<div class="sidebar-bottom"><span class="status-dot"></span><span id="connection-label">Checking service…</span></div>
+</aside><div class="scrim" id="scrim"></div>
+<main class="main">
+<header class="topbar"><button class="menu-btn" id="menu-btn" aria-label="Open menu">☰</button><div><div class="crumb">CAMPTECH / <span id="crumb-current">OVERVIEW</span></div><div class="top-title">Oyo public information workspace</div></div><a class="top-link" href="https://github.com/demtaiwo1-eng/sharafadeenalli" target="_blank" rel="noreferrer">Project source ↗</a></header>
+<div class="content">
+<section class="view active" id="view-home">
+<div class="welcome"><div><div class="eyebrow">PUBLIC INFORMATION · OPERATIONS</div><h1>Clarity for the work<br>happening across Oyo.</h1><p>A shared workspace for verified public updates, open-source media monitoring and coordinated field reporting.</p></div><div class="welcome-stamp">OYO<br><b>01</b></div></div>
+<div class="notice"><b>Foundation status</b><span>The interface is committed. Connect the API and database to activate shared updates, monitoring and project records. Field reports saved before API activation remain on this device only.</span></div>
+<div class="section-heading"><div><span class="eyebrow">WORKSPACE</span><h2>Platform modules</h2></div><span class="muted">Choose a workspace</span></div>
+<div class="module-grid">
+<button class="module-card" data-go="updates"><span class="module-icon">↗</span><b>Public updates</b><small>Browse sourced announcements and news.</small><span class="module-arrow">Open workspace →</span></button>
+<button class="module-card" data-go="monitoring"><span class="module-icon">⌕</span><b>Media monitor</b><small>Search connected public-source records.</small><span class="module-arrow">Open workspace →</span></button>
+<button class="module-card" data-go="operations"><span class="module-icon">▦</span><b>Operations</b><small>Track public projects and delivery status.</small><span class="module-arrow">Open workspace →</span></button>
+<button class="module-card" data-go="field"><span class="module-icon">⌖</span><b>Field reporting</b><small>Record dated observations with a review trail.</small><span class="module-arrow">Open workspace →</span></button>
+</div>
+<div class="section-heading"><div><span class="eyebrow">SERVICE STATUS</span><h2>Connection checks</h2></div></div>
+<div class="status-grid"><div class="status-card"><span class="status-label">API service</span><b id="api-status">Checking…</b><small id="api-detail">Waiting for service response</small></div><div class="status-card"><span class="status-label">Public updates</span><b id="updates-count">—</b><small>Records returned by connected API</small></div><div class="status-card"><span class="status-label">Projects</span><b id="projects-count">—</b><small>Records returned by connected API</small></div></div>
 </section>
-<footer>CampTech Oyo · Public information and operational coordination. Information should be sourced, dated, reviewed and corrected transparently.</footer>
-</main></body></html>
+<section class="view" id="view-updates"><div class="page-heading"><div class="eyebrow">PUBLIC INFORMATION</div><h1>Public updates</h1><p>Browse published information with source links and verification labels.</p></div><div class="toolbar"><input id="updates-search" type="search" placeholder="Search titles, topics or sources"><button class="btn secondary" id="refresh-updates">Refresh</button></div><div id="updates-list" class="record-list"><div class="empty-state">Connecting to the public updates service…</div></div></section>
+<section class="view" id="view-monitoring"><div class="page-heading"><div class="eyebrow">OPEN-SOURCE MONITORING</div><h1>Media monitor</h1><p>Search indexed public-source material. This workspace does not profile individuals or infer private political opinions.</p></div><form id="monitor-form" class="search-panel"><label for="monitor-query">Keyword or topic</label><div class="search-row"><input id="monitor-query" placeholder="e.g. Oyo State, public works, #Sarafadeen" required><button class="btn primary">Search records</button></div><small>Search is limited to records actually ingested into the connected service.</small></form><div id="monitor-results" class="record-list"><div class="empty-state">Enter a keyword to search connected public-source records.</div></div></section>
+<section class="view" id="view-operations"><div class="page-heading"><div class="eyebrow">DELIVERY MANAGEMENT</div><h1>Operations</h1><p>Project visibility and coordination. Private records require authenticated team access in the production API.</p></div><div id="projects-list" class="record-list"><div class="empty-state">Loading projects…</div></div></section>
+<section class="view" id="view-field"><div class="page-heading"><div class="eyebrow">FIELD INTELLIGENCE</div><h1>Submit a field report</h1><p>Record an observation, event update or service issue. Avoid entering unnecessary personal or sensitive information.</p></div>
+<form id="field-form" class="form-panel">
+<label>Report category<select name="category" required><option value="">Choose a category</option><option>Event update</option><option>Infrastructure or service issue</option><option>Public information correction</option><option>Safety observation</option><option>Other observation</option></select></label>
+<div class="form-row"><label>Local Government Area<input name="lga" maxlength="100" placeholder="e.g. Ibadan North" required></label><label>Ward / area<input name="ward" maxlength="100" placeholder="Ward or community"></label></div>
+<label>Observation<textarea name="description" rows="5" minlength="20" maxlength="3000" placeholder="Describe what you observed. Separate direct observations from information reported by others." required></textarea></label>
+<label>Source or supporting link (optional)<input name="sourceUrl" type="url" placeholder="https://"></label>
+<label class="checkline"><input type="checkbox" name="accuracy" required> I confirm this report is accurate to the best of my knowledge and does not intentionally expose private personal information.</label>
+<button class="btn primary" type="submit">Save report on this device</button><p class="form-hint" id="field-feedback">Until a secure reporting API is configured, reports are stored only in this browser on this device.</p>
+</form>
+<div class="section-heading"><div><span class="eyebrow">LOCAL DRAFTS</span><h2>Reports on this device</h2></div><button class="btn text-btn" id="clear-reports">Clear local drafts</button></div><div id="local-reports" class="record-list"></div>
+</section>
+<footer>CampTech Oyo · Public information and operational coordination · <a href="https://github.com/demtaiwo1-eng/sharafadeenalli.github.io">Website source</a></footer>
+</div></main><script src="config.js"></script><script src="app.js"></script>
+</body></html>
