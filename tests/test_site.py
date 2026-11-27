@@ -88,9 +88,10 @@ class SarafadeenBrowserReview(unittest.TestCase):
         form = self.driver.find_element(By.ID, "field-form")
         self.driver.find_element(By.NAME, "category").send_keys("Other observation")
         self.driver.find_element(By.NAME, "lga").send_keys("Ibadan North")
-        self.driver.find_element(By.NAME, "description").send_keys(
-            "Selenium browser review: a public streetlight was observed not working."
-        )
+        description = self.wait.until(EC.visibility_of_element_located((By.NAME, "description")))
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", description)
+        description.click()
+        description.send_keys("Selenium browser review: a public streetlight was observed not working.")
         self.driver.find_element(By.NAME, "accuracy").click()
         form.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
         self.wait.until(
