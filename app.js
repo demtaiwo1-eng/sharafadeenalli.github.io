@@ -41,14 +41,14 @@ function renderIntegrations(){
  if(!groups)return;
  if(!integrationCatalog.length){groups.innerHTML='<div class="empty-state">No integration catalogue was returned by the API.</div>';return}
  const selected=new Set(selectedIntegrations());
- const names={social:"Social platforms",community:"Community platforms",publisher:"News and publisher feeds",public_data:"Government and public datasets",aggregator:"Unified API providers"};
- const ordered=["social","community","publisher","public_data","aggregator"];
+ const names={social:"Social platforms",video:"Video and livestream platforms",community:"Community platforms",publisher:"News and publisher feeds",public_data:"Government and public datasets",aggregator:"Unified API providers"};
+ const ordered=["social","video","community","publisher","public_data","aggregator"];
  groups.innerHTML=ordered.map(kind=>{
   const items=integrationCatalog.filter(x=>x.kind===kind);
   if(!items.length)return "";
   return '<section class="integration-group"><h2>'+esc(names[kind]||kind)+'</h2><div class="integration-grid">'+items.map(item=>{
    const status=item.configured?"configured_not_tested":"not_configured";
-   const label=item.configured?"Credentials present · not tested":"Not configured";
+   const label=item.connectionStatus==="public_access_unverified"?"Public API · connection test pending":(item.configured?"Credentials present · not tested":"Not configured");
    const env=(item.requiredEnvironment||[]).join(" · ");
    return '<article class="integration-card"><div class="integration-card-head"><div><h3>'+esc(item.name)+'</h3><span class="integration-status '+status+'">'+label+'</span></div><label class="integration-select"><input type="checkbox" data-integration="'+esc(item.id)+'" '+(selected.has(item.id)?"checked":"")+'> Include</label></div><p>'+esc(item.access||"See provider documentation for access requirements.")+'</p><div class="integration-capabilities">Capabilities: '+esc((item.capabilities||[]).join(", "))+'</div><p class="integration-env">Server variables: '+esc(env||"None required")+'</p><a href="'+esc(item.docs)+'" target="_blank" rel="noopener noreferrer">Developer documentation ↗</a></article>';
   }).join("")+'</div></section>';
