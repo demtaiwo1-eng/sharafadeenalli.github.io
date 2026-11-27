@@ -24,6 +24,17 @@ async function loadOyoScope(){
   modules.innerHTML='<div class="empty-state">Analysis framework could not be loaded.</div>';
  }
 }
+async function loadKeywordInsights(){
+ const status=$("#keyword-status"), tags=$("#discovered-hashtags"), words=$("#discovered-keywords");
+ if(!status||!tags||!words)return;
+ try{
+  const data=await request("/v1/monitoring/keywords?limit=24");
+  const hashtags=data.hashtags||[], keywords=(data.keywords||[]).filter(x=>x.term_type!=="hashtag");
+  status.textContent=Number((data.indexedPostsByPlatform||[]).reduce((n,x)=>n+Number(x.indexed_posts||0),0)).toLocaleString()+" indexed term records";
+  tags.innerHTML=hashtags.length?hashtags.map(x=>'<span class="keyword-chip">#'+esc(x.hashtag)+' <b>'+Number(x.posts||0)+'</b></span>').join(""):'<div class="empty-state">No discovered hashtags yet.</div>';
+  words.innerHTML=keywords.length?keywords.slice(0,16).map(x=>'<div class="keyword-row"><span>'+esc(x.keyword)+'</span><b>'+Number(x.posts||0)+'</b></div>').join(""):'<div class="empty-state">No extracted words or phrases yet.</div>';
+ }catch(error){status.textContent="Keyword index unavailable";tags.innerHTML='<div class="empty-state">'+esc(error.message)+'</div>';words.innerHTML='<div class="empty-state">No keyword data available.</div>';}
+}
 async function loadHashtag(){
  const state=$("#monitor-state"), feed=$("#hashtag-feed");
  try{
@@ -121,5 +132,5 @@ const KEY="camptech.fieldReports.v1";function localRows(){try{return JSON.parse(
 function renderLocal(){const rows=localRows();$("#local-reports").innerHTML=rows.length?rows.map(x=>'<article class="record"><div class="record-meta">'+esc(x.category)+' · '+esc(date(x.createdAt))+'</div><h3>'+esc(x.lga)+(x.ward?" · "+esc(x.ward):"")+'</h3><p>'+esc(x.description)+'</p>'+(x.sourceUrl?'<a href="'+esc(x.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Supporting source ↗</a>':"")+'<p><span class="badge">LOCAL DRAFT · NOT SUBMITTED</span></p></article>').join(""):'<div class="empty-state">No local drafts saved on this device.</div>'}
 $("#field-form").addEventListener("submit",e=>{e.preventDefault();const f=new FormData(e.currentTarget);const rows=localRows();rows.unshift({category:f.get("category"),lga:f.get("lga"),ward:f.get("ward"),description:f.get("description"),sourceUrl:f.get("sourceUrl"),createdAt:new Date().toISOString()});try{localStorage.setItem(KEY,JSON.stringify(rows.slice(0,100)));e.currentTarget.reset();$("#field-feedback").textContent="Draft saved in this browser only. It has NOT been sent to the team or server.";renderLocal()}catch{$("#field-feedback").textContent="Could not save locally. Check browser storage availability."}});
 $("#clear-reports").addEventListener("click",()=>{if(confirm("Delete all field-report drafts saved on this device?")){localStorage.removeItem(KEY);renderLocal()}});
-const hash=location.hash.replace("#","");if(["updates","monitoring","operations","field","integrations"].includes(hash))navigate(hash);loadAll();renderLocal();loadHashtag();loadIntegrations();loadOyoScope();monitorTimer=setInterval(loadHashtag,5000);
+const hash=location.hash.replace("#","");if(["updates","monitoring","operations","field","integrations"].includes(hash))navigate(hash);loadAll();renderLocal();loadHashtag();loadKeywordInsights();loadIntegrations();loadOyoScope();monitorTimer=setInterval(loadHashtag,5000);
 })();
