@@ -69,11 +69,19 @@ class SarafadeenBrowserReview(unittest.TestCase):
         )
 
     def test_navigation_opens_each_primary_view(self):
-        for view in ("updates", "monitoring", "operations", "field"):
+        for view in ("updates", "monitoring", "operations", "field", "integrations"):
             link = self.driver.find_element(By.CSS_SELECTOR, '[data-view="' + view + '"]')
             self.driver.execute_script("arguments[0].click();", link)
             panel = self.driver.find_element(By.ID, "view-" + view)
             self.assertIn("active", panel.get_attribute("class"), view + " view did not activate")
+
+    def test_api_connections_view_exposes_source_picker_controls(self):
+        self.driver.find_element(By.CSS_SELECTOR, '[data-view="integrations"]').click()
+        self.assertTrue(self.driver.find_element(By.ID, "view-integrations").is_displayed())
+        self.assertTrue(self.driver.find_element(By.ID, "select-all-integrations").is_displayed())
+        self.assertTrue(self.driver.find_element(By.ID, "clear-integrations").is_displayed())
+        self.assertTrue(self.driver.find_element(By.ID, "refresh-integrations").is_displayed())
+        self.screenshot("api-connections.png")
 
     def test_field_report_form_validates_and_saves_local_draft(self):
         self.driver.find_element(By.CSS_SELECTOR, '[data-view="field"]').click()
