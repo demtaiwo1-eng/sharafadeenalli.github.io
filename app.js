@@ -31,6 +31,23 @@ async function loadHashtag(){
  }catch(e){state.textContent="Monitor unavailable";$("#monitor-dot").classList.remove("online");$("#monitor-updated").textContent="Unavailable";feed.innerHTML='<div class="empty-state">The live monitor could not be reached: '+esc(e.message)+'. Existing counts are not being fabricated.</div>';}
 }
 
+// Theme: light is the default; users can switch to dark and the choice persists on this device.
+const themeToggle=$("#theme-toggle");
+function applyTheme(theme){
+ const selected=theme==="dark"?"dark":"light";
+ document.documentElement.setAttribute("data-ephinta-theme",selected);
+ if(themeToggle){
+  const next=selected==="dark"?"light":"dark";
+  themeToggle.setAttribute("aria-label","Switch to "+next+" mode");
+  themeToggle.setAttribute("title","Switch to "+next+" mode");
+  themeToggle.setAttribute("aria-pressed",String(selected==="dark"));
+ }
+ try{localStorage.setItem("sarafadeen.theme",selected)}catch{}
+}
+let savedTheme="light";
+try{savedTheme=localStorage.getItem("sarafadeen.theme")||"light"}catch{}
+applyTheme(savedTheme);
+themeToggle?.addEventListener("click",()=>applyTheme(document.documentElement.getAttribute("data-ephinta-theme")==="dark"?"light":"dark"));
 function navigate(view){document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id==="view-"+view));document.querySelectorAll(".nav-link").forEach(x=>x.classList.toggle("active",x.dataset.view===view));$("#crumb-current").textContent=view.toUpperCase();history.replaceState(null,"","#"+view);$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show");if(view==="field")renderLocal()}
 document.querySelectorAll("[data-view]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();navigate(a.dataset.view)}));document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.go)));
 $("#menu-btn").addEventListener("click",()=>{$("#sidebar").classList.add("open");$("#scrim").classList.add("show")});$("#scrim").addEventListener("click",()=>{$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show")});
