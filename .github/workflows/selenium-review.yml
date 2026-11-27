@@ -30,9 +30,9 @@ jobs:
           cache-dependency-path: requirements-test.txt
 
       - name: Install Chromium and matching ChromeDriver
-        uses: browser-actions/setup-chrome@v1
+        uses: browser-actions/setup-chrome@v2
         with:
-          chrome-version: stable
+          chrome-version: latest
           install-chromedriver: true
 
       - name: Install Selenium
