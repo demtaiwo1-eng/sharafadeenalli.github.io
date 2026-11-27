@@ -11,6 +11,19 @@ function updateCards(list,target){target.innerHTML=list.length?list.map(x=>'<art
 function projectCards(list){$("#projects-list").innerHTML=list.length?list.map(x=>'<article class="record"><div class="record-meta">PROJECT · '+esc(x.status||"status not set")+'</div><h3>'+esc(x.name||"Untitled project")+'</h3><p>'+esc(x.description||"No description supplied.")+'</p><small class="muted">Last updated: '+esc(date(x.updatedAt))+'</small></article>').join(""):'<div class="empty-state">No project records available from the connected service.</div>'}
 async function loadAll(){try{const [u,p]=await Promise.all([request("/v1/public/updates?limit=30"),request("/v1/operations/projects")]);updates=Array.isArray(u)?u:(u.items||[]);projects=Array.isArray(p)?p:(p.items||[]);setStatus(true,"API responded successfully");if($("#updates-count"))$("#updates-count").textContent=updates.length;if($("#projects-count"))$("#projects-count").textContent=projects.length;updateCards(updates,$("#updates-list"));projectCards(projects)}catch(e){setStatus(false,e.message);if($("#updates-count"))$("#updates-count").textContent="—";if($("#projects-count"))$("#projects-count").textContent="—";$("#updates-list").innerHTML='<div class="empty-state">Public updates are not connected yet. Configure the API service to load real, sourced records.</div>';$("#projects-list").innerHTML='<div class="empty-state">Project records are not connected yet. No demonstration projects are being presented as real.</div>'}}
 
+async function loadOyoScope(){
+ const coverage=$("#oyo-coverage"), modules=$("#analysis-modules");
+ try{
+  const result=await request("/v1/monitoring/scope");
+  const scope=result.scope||{};
+  const geo=scope.geography||{};
+  coverage.innerHTML='<div class="oyo-schematic" role="list" aria-label="Oyo State monitoring coverage areas">'+(geo.coverage||[]).map((area,i)=>'<div class="oyo-region region-'+(i+1)+'" role="listitem"><span class="region-pin"></span><b>'+esc(area)+'</b></div>').join("")+'</div><div class="coverage-caption"><span class="coverage-key"></span>'+esc(geo.primary||"Oyo State, Nigeria")+'</div>';
+  modules.innerHTML=(scope.analysis||[]).map((name,i)=>'<div class="analysis-module"><span class="analysis-number">'+String(i+1).padStart(2,"0")+'</span><span>'+esc(name.replaceAll("_"," "))+'</span><span class="module-state">IN SCOPE</span></div>').join("");
+ }catch(error){
+  coverage.innerHTML='<div class="empty-state">Oyo monitoring scope is unavailable: '+esc(error.message)+'.</div>';
+  modules.innerHTML='<div class="empty-state">Analysis framework could not be loaded.</div>';
+ }
+}
 async function loadHashtag(){
  const state=$("#monitor-state"), feed=$("#hashtag-feed");
  try{
@@ -108,5 +121,5 @@ const KEY="camptech.fieldReports.v1";function localRows(){try{return JSON.parse(
 function renderLocal(){const rows=localRows();$("#local-reports").innerHTML=rows.length?rows.map(x=>'<article class="record"><div class="record-meta">'+esc(x.category)+' · '+esc(date(x.createdAt))+'</div><h3>'+esc(x.lga)+(x.ward?" · "+esc(x.ward):"")+'</h3><p>'+esc(x.description)+'</p>'+(x.sourceUrl?'<a href="'+esc(x.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Supporting source ↗</a>':"")+'<p><span class="badge">LOCAL DRAFT · NOT SUBMITTED</span></p></article>').join(""):'<div class="empty-state">No local drafts saved on this device.</div>'}
 $("#field-form").addEventListener("submit",e=>{e.preventDefault();const f=new FormData(e.currentTarget);const rows=localRows();rows.unshift({category:f.get("category"),lga:f.get("lga"),ward:f.get("ward"),description:f.get("description"),sourceUrl:f.get("sourceUrl"),createdAt:new Date().toISOString()});try{localStorage.setItem(KEY,JSON.stringify(rows.slice(0,100)));e.currentTarget.reset();$("#field-feedback").textContent="Draft saved in this browser only. It has NOT been sent to the team or server.";renderLocal()}catch{$("#field-feedback").textContent="Could not save locally. Check browser storage availability."}});
 $("#clear-reports").addEventListener("click",()=>{if(confirm("Delete all field-report drafts saved on this device?")){localStorage.removeItem(KEY);renderLocal()}});
-const hash=location.hash.replace("#","");if(["updates","monitoring","operations","field","integrations"].includes(hash))navigate(hash);loadAll();renderLocal();loadHashtag();loadIntegrations();monitorTimer=setInterval(loadHashtag,5000);
+const hash=location.hash.replace("#","");if(["updates","monitoring","operations","field","integrations"].includes(hash))navigate(hash);loadAll();renderLocal();loadHashtag();loadIntegrations();loadOyoScope();monitorTimer=setInterval(loadHashtag,5000);
 })();
