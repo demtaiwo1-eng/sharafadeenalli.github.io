@@ -24,6 +24,33 @@ async function loadOyoScope(){
   modules.innerHTML='<div class="empty-state">Analysis framework could not be loaded.</div>';
  }
 }
+async function loadDiscourseAnalytics(type="issue_map"){
+ const target=$("#analytics-report-content"); if(!target)return;
+ target.innerHTML='<div class="empty-state">Loading '+esc(type.replace("_"," "))+' analysis…</div>';
+ try{
+  const data=await request("/v1/monitoring/analytics?type="+encodeURIComponent(type)+"&days=30");
+  const f=data.findings||{}, sample=Number(f.sampleSize||0);
+  $("#analytics-period").textContent="Last "+Number(f.periodDays||30)+" days · "+sample.toLocaleString()+" records";
+  let body="";
+  if(type==="issue_map"||type==="trend"){
+   const rows=type==="trend"?(f.dailyTrend||[]).slice(-14).map(x=>({label:x.date,value:x.posts})): (f.issueMap||[]).slice(0,10).map(x=>({label:x.label,value:x.posts}));
+   body=rows.length?'<div class="analytics-bars">'+rows.map(x=>'<div class="analytics-bar-row"><span>'+esc(x.label)+'</span><div class="analytics-bar-track"><i style="width:'+Math.max(3,Math.round(x.value/Math.max(1,...rows.map(y=>y.value))*100))+'%"></i></div><b>'+Number(x.value).toLocaleString()+'</b></div>').join("")+'</div>':'<div class="empty-state">No collected records in this period yet.</div>';
+  }else if(type==="sentiment"){
+   const s=f.sentimentLanguageCounts||{};
+   body='<div class="analytics-kpis"><div><b>'+Number(s.positive_language||0)+'</b><span>Positive-language signals</span></div><div><b>'+Number(s.negative_language||0)+'</b><span>Negative-language signals</span></div><div><b>'+Number(s.mixed_or_unclear||0)+'</b><span>Mixed / unclear</span></div></div>';
+  }else if(type==="swot"){
+   const sw=f.swot||{}; body=['strengths','weaknesses','opportunities','threats'].map(k=>'<div class="analytics-report-block"><h3>'+k.toUpperCase()+'</h3><ul>'+((sw[k]||[]).map(x=>'<li>'+esc(x)+'</li>').join("")||'<li>No findings.</li>')+'</ul></div>').join("");
+  }else if(type==="pestle"){
+   body=(f.pestle||[]).map(x=>'<div class="analytics-report-block"><h3>'+esc(x.dimension)+'</h3><p>'+esc(x.signal)+'</p><small>'+((x.issues||[]).map(i=>esc(i.label)).join(" · ")||"No issue signals detected")+'</small></div>').join("");
+  }else if(type==="risk"){
+   body=(f.risks||[]).map(x=>'<div class="analytics-report-block"><h3>'+esc(x.risk)+' <small>('+esc(x.level)+')</small></h3><p>'+esc(x.basis)+'</p></div>').join("");
+  }else{
+   body='<div class="empty-state">Evidence review is available through the API report response.</div>';
+  }
+  target.innerHTML=body;
+  document.querySelectorAll("[data-report]").forEach(b=>b.classList.toggle("primary",b.dataset.report===type));
+ }catch(error){target.innerHTML='<div class="empty-state">Analytics unavailable: '+esc(error.message)+'</div>';}
+}
 async function loadKeywordInsights(){
  const status=$("#keyword-status"), tags=$("#discovered-hashtags"), words=$("#discovered-keywords");
  if(!status||!tags||!words)return;
@@ -132,5 +159,5 @@ const KEY="camptech.fieldReports.v1";function localRows(){try{return JSON.parse(
 function renderLocal(){const rows=localRows();$("#local-reports").innerHTML=rows.length?rows.map(x=>'<article class="record"><div class="record-meta">'+esc(x.category)+' · '+esc(date(x.createdAt))+'</div><h3>'+esc(x.lga)+(x.ward?" · "+esc(x.ward):"")+'</h3><p>'+esc(x.description)+'</p>'+(x.sourceUrl?'<a href="'+esc(x.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Supporting source ↗</a>':"")+'<p><span class="badge">LOCAL DRAFT · NOT SUBMITTED</span></p></article>').join(""):'<div class="empty-state">No local drafts saved on this device.</div>'}
 $("#field-form").addEventListener("submit",e=>{e.preventDefault();const f=new FormData(e.currentTarget);const rows=localRows();rows.unshift({category:f.get("category"),lga:f.get("lga"),ward:f.get("ward"),description:f.get("description"),sourceUrl:f.get("sourceUrl"),createdAt:new Date().toISOString()});try{localStorage.setItem(KEY,JSON.stringify(rows.slice(0,100)));e.currentTarget.reset();$("#field-feedback").textContent="Draft saved in this browser only. It has NOT been sent to the team or server.";renderLocal()}catch{$("#field-feedback").textContent="Could not save locally. Check browser storage availability."}});
 $("#clear-reports").addEventListener("click",()=>{if(confirm("Delete all field-report drafts saved on this device?")){localStorage.removeItem(KEY);renderLocal()}});
-const hash=location.hash.replace("#","");if(["updates","monitoring","operations","field","integrations"].includes(hash))navigate(hash);loadAll();renderLocal();loadHashtag();loadKeywordInsights();loadIntegrations();loadOyoScope();monitorTimer=setInterval(loadHashtag,5000);
+const hash=location.hash.replace("#","");if(["updates","monitoring","operations","field","integrations"].includes(hash))navigate(hash);loadAll();renderLocal();loadHashtag();loadKeywordInsights();loadDiscourseAnalytics();loadIntegrations();loadOyoScope();monitorTimer=setInterval(loadHashtag,5000);
 })();
