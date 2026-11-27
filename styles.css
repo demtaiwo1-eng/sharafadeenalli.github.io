@@ -89,3 +89,5 @@ html[data-ephinta-theme="colorful"] .module-state{color:var(--epg-link)}
 
 /* Ensure the field observation text area has a usable interactive surface. */
 .form-panel textarea[name="description"]{display:block;min-height:132px;height:auto;resize:vertical;line-height:1.5;}
+
+.keyword-insights-panel{margin:14px 0}.keyword-insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.keyword-insights-grid h3{font-size:12px;margin:0 0 10px;color:var(--epg-muted)}.keyword-cloud{display:flex;flex-wrap:wrap;gap:7px}.keyword-chip{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid var(--epg-border);border-radius:99px;background:var(--epg-surface-soft);font-size:11px;color:var(--epg-ink)}.keyword-chip b,.keyword-row b{color:#d76b3d;font-size:10px}.keyword-list{display:grid;gap:5px}.keyword-row{display:flex;justify-content:space-between;gap:10px;padding:7px 9px;border-bottom:1px solid var(--epg-border);font-size:11px;color:var(--epg-ink)}@media(max-width:720px){.keyword-insights-grid{grid-template-columns:1fr}}
