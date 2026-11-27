@@ -85,7 +85,8 @@ class SarafadeenBrowserReview(unittest.TestCase):
 
     def test_field_report_form_validates_and_saves_local_draft(self):
         self.driver.find_element(By.CSS_SELECTOR, '[data-view="field"]').click()
-        form = self.driver.find_element(By.ID, "field-form")
+        self.wait.until(lambda d: "active" in d.find_element(By.ID, "view-field").get_attribute("class"))
+        form = self.wait.until(EC.visibility_of_element_located((By.ID, "field-form")))
         self.driver.find_element(By.NAME, "category").send_keys("Other observation")
         self.driver.find_element(By.NAME, "lga").send_keys("Ibadan North")
         description = self.wait.until(EC.visibility_of_element_located((By.NAME, "description")))
