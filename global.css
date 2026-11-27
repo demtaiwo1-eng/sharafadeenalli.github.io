@@ -15,7 +15,6 @@
   --red: var(--epg-danger);
 }
 html, body { background: var(--epg-page); color: var(--epg-ink); font-family: var(--epg-font-body); }
-body { color-scheme: light; }
 .sidebar, .topbar { background: var(--epg-surface); border-color: var(--epg-border); }
 .brand, .top-title, .nav-link.active, .metric-card strong, .updated-stamp b,
 .feed-post p, .record h3 { color: var(--epg-ink); }
