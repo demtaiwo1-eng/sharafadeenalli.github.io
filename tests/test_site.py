@@ -84,7 +84,7 @@ class SarafadeenBrowserReview(unittest.TestCase):
         self.screenshot("api-connections.png")
 
     def test_field_report_form_validates_and_saves_local_draft(self):
-        self.driver.find_element(By.CSS_SELECTOR, '[data-view="field"]').click()
+        self.driver.find_element(By.CSS_SELECTOR, '.sidebar [data-view="field"]').click()
         self.wait.until(lambda d: "active" in d.find_element(By.ID, "view-field").get_attribute("class"))
         form = self.wait.until(EC.visibility_of_element_located((By.ID, "field-form")))
         self.driver.find_element(By.NAME, "category").send_keys("Other observation")
