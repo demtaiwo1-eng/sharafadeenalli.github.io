@@ -162,7 +162,8 @@ try{savedTheme=localStorage.getItem("sarafadeen.theme")||"light"}catch{}
 applyTheme(savedTheme);
 themeToggle?.addEventListener("click",()=>applyTheme(document.documentElement.getAttribute("data-ephinta-theme")==="dark"?"light":"dark"));
 function navigate(view){document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id==="view-"+view));document.querySelectorAll(".nav-link").forEach(x=>x.classList.toggle("active",x.dataset.view===view));$("#crumb-current").textContent=view.toUpperCase();history.replaceState(null,"","#"+view);$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show");if(view==="field")renderLocal();if(view==="integrations")loadIntegrations()}
-document.querySelectorAll("[data-report]").forEach(b=>b.addEventListener("click",()=>loadDiscourseAnalytics(b.dataset.report)));\n$("#refresh-coverage")?.addEventListener("click",loadProviderCoverage);
+document.querySelectorAll("[data-report]").forEach(b=>b.addEventListener("click",()=>loadDiscourseAnalytics(b.dataset.report)));
+$("#refresh-coverage")?.addEventListener("click",loadProviderCoverage);
 document.querySelectorAll("[data-view]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();navigate(a.dataset.view)}));document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.go)));
 $("#menu-btn").addEventListener("click",()=>{$("#sidebar").classList.add("open");$("#scrim").classList.add("show")});$("#scrim").addEventListener("click",()=>{$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show")});
 $("#refresh-updates").addEventListener("click",loadAll);
