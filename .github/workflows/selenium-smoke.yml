@@ -1,0 +1,57 @@
+name: Selenium Chromium smoke test
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Chromium and Selenium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser chromium-chromedriver || sudo apt-get install -y chromium chromium-driver
+          python -m pip install --upgrade pip selenium
+      - name: Start static site
+        run: |
+          python -m http.server 8000 > /tmp/site.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/ >/dev/null && break; sleep 1; done
+      - name: Check dashboard and service worker registration
+        run: |
+          python - <<'PY'
+          import time
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.common.by import By
+          from selenium.webdriver.support.ui import WebDriverWait
+
+          options = Options()
+          options.add_argument("--headless=new")
+          options.add_argument("--no-sandbox")
+          options.add_argument("--disable-dev-shm-usage")
+          options.add_experimental_option("prefs", {"profile.default_content_setting_values.notifications": 1})
+          driver = webdriver.Chrome(options=options)
+          try:
+              driver.get("http://127.0.0.1:8000/")
+              WebDriverWait(driver, 20).until(lambda d: d.find_element(By.ID, "enable-notifications").is_displayed())
+              assert "Sarafadeen" in driver.title
+              driver.find_element(By.ID, "enable-notifications").click()
+              WebDriverWait(driver, 10).until(
+                  lambda d: d.execute_script("return !!(navigator.serviceWorker && navigator.serviceWorker.controller) || !!window.__swRegistered")
+                  or d.execute_script("return navigator.serviceWorker.getRegistration().then(Boolean)")
+              )
+              registration = driver.execute_async_script("""
+                const done = arguments[0];
+                navigator.serviceWorker.getRegistration().then(r => done(!!r)).catch(() => done(false));
+              """)
+              assert registration, "Service worker was not registered"
+              print("Dashboard loaded and notification service worker registered.")
+          finally:
+              driver.quit()
+          PY
