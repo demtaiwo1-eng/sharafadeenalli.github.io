@@ -1,0 +1,37 @@
+/* Shared theme foundations sourced from demtaiwo1-eng/Winning-game-. */
+@import url("./ephinta-global-theme-contract.css");
+@import url("./ephinta-dashboard-system.css");
+/* Sarafadeen dashboard adapter for the shared EPHINTA global theme contract. */
+:root {
+  --bg: var(--epg-page);
+  --panel: var(--epg-surface);
+  --panel2: var(--epg-surface-soft);
+  --line: var(--epg-border);
+  --ink: var(--epg-ink);
+  --muted: var(--epg-muted);
+  --cyan: var(--epg-accent);
+  --gold: #b7791f;
+  --green: var(--epg-success);
+  --red: var(--epg-danger);
+}
+html, body { background: var(--epg-page); color: var(--epg-ink); font-family: var(--epg-font-body); }
+body { color-scheme: light; }
+.sidebar, .topbar { background: var(--epg-surface); border-color: var(--epg-border); }
+.brand, .top-title, .nav-link.active, .metric-card strong, .updated-stamp b,
+.feed-post p, .record h3 { color: var(--epg-ink); }
+.nav-link { color: var(--epg-muted); }
+.nav-link:hover, .nav-link.active { background: var(--epg-surface-soft); }
+.metric-card, .analytics-panel, .monitor-toolbar, .record, .form-panel, .search-panel, .status-card {
+  background: var(--epg-surface); border-color: var(--epg-border); color: var(--epg-ink);
+  box-shadow: var(--epg-shadow);
+}
+.metric-card small, .metric-label, .dashboard-heading p, .updated-stamp,
+.feed-meta, .feed-bottom, .record p, .form-hint { color: var(--epg-muted); }
+.metric-card.metric-primary { background: linear-gradient(135deg, color-mix(in srgb, var(--epg-accent) 13%, var(--epg-surface)), var(--epg-surface)); border-color: var(--epg-border); }
+.tag-chip, .btn.primary { background: var(--epg-accent); color: var(--epg-accent-ink); }
+a { color: var(--epg-link); }
+input, textarea, select { background: var(--epg-surface-raised); color: var(--epg-ink); border-color: var(--epg-border); }
+input::placeholder, textarea::placeholder { color: var(--epg-subtle); }
+.empty-state { border-color: var(--epg-border); color: var(--epg-muted); }
+footer { border-color: var(--epg-border); color: var(--epg-muted); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
