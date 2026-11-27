@@ -51,6 +51,18 @@ async function loadDiscourseAnalytics(type="issue_map"){
   document.querySelectorAll("[data-report]").forEach(b=>b.classList.toggle("primary",b.dataset.report===type));
  }catch(error){target.innerHTML='<div class="empty-state">Analytics unavailable: '+esc(error.message)+'</div>';}
 }
+async function loadProviderCoverage(){
+ const target=$("#provider-coverage-grid"); if(!target)return;
+ try{
+  const data=await request("/v1/monitoring/coverage");
+  const providers=data.providers||[];
+  target.innerHTML=providers.length?providers.map(p=>{
+   const status=String(p.status||"unknown"), cls=status==="succeeded"?"good":status==="partial"?"warn":status==="rate_limited"?"warn":"bad";
+   const date=p.lastFinishedAt?new Date(p.lastFinishedAt).toLocaleString():"Run pending";
+   return '<article class="coverage-card"><div class="coverage-card-head"><strong>'+esc(p.platform)+'</strong><span class="coverage-status '+cls+'">'+esc(status.replace("_"," "))+'</span></div><div class="coverage-stats"><span>'+Number(p.postsSeen||0)+' posts</span><span>'+Number(p.repliesSeen||0)+' replies</span><span>'+Number(p.errors||0)+' errors</span></div><small>Last checked: '+esc(date)+'</small></article>';
+  }).join(""):'<div class="empty-state">No provider runs have been recorded yet. The first scheduled collection will populate this view.</div>';
+ }catch(error){target.innerHTML='<div class="empty-state">Coverage status unavailable: '+esc(error.message)+'</div>';}
+}
 async function loadKeywordInsights(){
  const status=$("#keyword-status"), tags=$("#discovered-hashtags"), words=$("#discovered-keywords");
  if(!status||!tags||!words)return;
@@ -150,7 +162,7 @@ try{savedTheme=localStorage.getItem("sarafadeen.theme")||"light"}catch{}
 applyTheme(savedTheme);
 themeToggle?.addEventListener("click",()=>applyTheme(document.documentElement.getAttribute("data-ephinta-theme")==="dark"?"light":"dark"));
 function navigate(view){document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id==="view-"+view));document.querySelectorAll(".nav-link").forEach(x=>x.classList.toggle("active",x.dataset.view===view));$("#crumb-current").textContent=view.toUpperCase();history.replaceState(null,"","#"+view);$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show");if(view==="field")renderLocal();if(view==="integrations")loadIntegrations()}
-document.querySelectorAll("[data-report]").forEach(b=>b.addEventListener("click",()=>loadDiscourseAnalytics(b.dataset.report)));
+document.querySelectorAll("[data-report]").forEach(b=>b.addEventListener("click",()=>loadDiscourseAnalytics(b.dataset.report)));\n$("#refresh-coverage")?.addEventListener("click",loadProviderCoverage);
 document.querySelectorAll("[data-view]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();navigate(a.dataset.view)}));document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.go)));
 $("#menu-btn").addEventListener("click",()=>{$("#sidebar").classList.add("open");$("#scrim").classList.add("show")});$("#scrim").addEventListener("click",()=>{$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show")});
 $("#refresh-updates").addEventListener("click",loadAll);
@@ -160,5 +172,5 @@ const KEY="camptech.fieldReports.v1";function localRows(){try{return JSON.parse(
 function renderLocal(){const rows=localRows();$("#local-reports").innerHTML=rows.length?rows.map(x=>'<article class="record"><div class="record-meta">'+esc(x.category)+' · '+esc(date(x.createdAt))+'</div><h3>'+esc(x.lga)+(x.ward?" · "+esc(x.ward):"")+'</h3><p>'+esc(x.description)+'</p>'+(x.sourceUrl?'<a href="'+esc(x.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Supporting source ↗</a>':"")+'<p><span class="badge">LOCAL DRAFT · NOT SUBMITTED</span></p></article>').join(""):'<div class="empty-state">No local drafts saved on this device.</div>'}
 $("#field-form").addEventListener("submit",e=>{e.preventDefault();const f=new FormData(e.currentTarget);const rows=localRows();rows.unshift({category:f.get("category"),lga:f.get("lga"),ward:f.get("ward"),description:f.get("description"),sourceUrl:f.get("sourceUrl"),createdAt:new Date().toISOString()});try{localStorage.setItem(KEY,JSON.stringify(rows.slice(0,100)));e.currentTarget.reset();$("#field-feedback").textContent="Draft saved in this browser only. It has NOT been sent to the team or server.";renderLocal()}catch{$("#field-feedback").textContent="Could not save locally. Check browser storage availability."}});
 $("#clear-reports").addEventListener("click",()=>{if(confirm("Delete all field-report drafts saved on this device?")){localStorage.removeItem(KEY);renderLocal()}});
-const hash=location.hash.replace("#","");if(["updates","monitoring","operations","field","integrations"].includes(hash))navigate(hash);loadAll();renderLocal();loadHashtag();loadKeywordInsights();loadDiscourseAnalytics();loadIntegrations();loadOyoScope();monitorTimer=setInterval(loadHashtag,5000);
+const hash=location.hash.replace("#","");if(["updates","monitoring","operations","field","integrations"].includes(hash))navigate(hash);loadAll();renderLocal();loadHashtag();loadKeywordInsights();loadDiscourseAnalytics();loadProviderCoverage();loadIntegrations();loadOyoScope();monitorTimer=setInterval(loadHashtag,5000);
 })();
