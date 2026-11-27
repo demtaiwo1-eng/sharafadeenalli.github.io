@@ -31,7 +31,7 @@ async function loadKeywordInsights(){
   const data=await request("/v1/monitoring/keywords?limit=24");
   const hashtags=data.hashtags||[], keywords=(data.keywords||[]).filter(x=>x.term_type!=="hashtag");
   status.textContent=Number((data.indexedPostsByPlatform||[]).reduce((n,x)=>n+Number(x.indexed_records||0),0)).toLocaleString()+" indexed term records";
-  tags.innerHTML=hashtags.length?hashtags.map(x=>'<span class="keyword-chip">#'+esc(x.hashtag)+' <b>'+Number(x.records||0)+'</b></span>').join(""):'<div class="empty-state">No discovered hashtags yet.</div>';
+  tags.innerHTML=hashtags.length?hashtags.map(x=>'<span class="keyword-chip">'+esc(x.hashtag)+' <b>'+Number(x.records||0)+'</b></span>').join(""):'<div class="empty-state">No discovered hashtags yet.</div>';
   words.innerHTML=keywords.length?keywords.slice(0,16).map(x=>'<div class="keyword-row"><span>'+esc(x.keyword)+'</span><b>'+Number(x.records||0)+'</b></div>').join(""):'<div class="empty-state">No extracted words or phrases yet.</div>';
  }catch(error){status.textContent="Keyword index unavailable";tags.innerHTML='<div class="empty-state">'+esc(error.message)+'</div>';words.innerHTML='<div class="empty-state">No keyword data available.</div>';}
 }
