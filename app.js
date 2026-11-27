@@ -31,6 +31,56 @@ async function loadHashtag(){
  }catch(e){state.textContent="Monitor unavailable";$("#monitor-dot").classList.remove("online");$("#monitor-updated").textContent="Unavailable";feed.innerHTML='<div class="empty-state">The live monitor could not be reached: '+esc(e.message)+'. Existing counts are not being fabricated.</div>';}
 }
 
+
+const INTEGRATION_SELECTION_KEY="sarafadeen.integrationSelection.v1";
+let integrationCatalog=[];
+function selectedIntegrations(){try{return JSON.parse(localStorage.getItem(INTEGRATION_SELECTION_KEY)||"[]")}catch{return []}}
+function saveIntegrationSelection(ids){try{localStorage.setItem(INTEGRATION_SELECTION_KEY,JSON.stringify(ids))}catch{}}
+function renderIntegrations(){
+ const groups=$("#integration-groups");
+ if(!groups)return;
+ if(!integrationCatalog.length){groups.innerHTML='<div class="empty-state">No integration catalogue was returned by the API.</div>';return}
+ const selected=new Set(selectedIntegrations());
+ const names={social:"Social platforms",community:"Community platforms",publisher:"News and publisher feeds",public_data:"Government and public datasets",aggregator:"Unified API providers"};
+ const ordered=["social","community","publisher","public_data","aggregator"];
+ groups.innerHTML=ordered.map(kind=>{
+  const items=integrationCatalog.filter(x=>x.kind===kind);
+  if(!items.length)return "";
+  return '<section class="integration-group"><h2>'+esc(names[kind]||kind)+'</h2><div class="integration-grid">'+items.map(item=>{
+   const status=item.configured?"configured_not_tested":"not_configured";
+   const label=item.configured?"Credentials present · not tested":"Not configured";
+   const env=(item.requiredEnvironment||[]).join(" · ");
+   return '<article class="integration-card"><div class="integration-card-head"><div><h3>'+esc(item.name)+'</h3><span class="integration-status '+status+'">'+label+'</span></div><label class="integration-select"><input type="checkbox" data-integration="'+esc(item.id)+'" '+(selected.has(item.id)?"checked":"")+'> Include</label></div><p>'+esc(item.access||"See provider documentation for access requirements.")+'</p><div class="integration-capabilities">Capabilities: '+esc((item.capabilities||[]).join(", "))+'</div><p class="integration-env">Server variables: '+esc(env||"None required")+'</p><a href="'+esc(item.docs)+'" target="_blank" rel="noopener noreferrer">Developer documentation ↗</a></article>';
+  }).join("")+'</div></section>';
+ }).join("");
+ const count=$("#integration-count");
+ if(count)count.textContent=integrationCatalog.length+" integrations assessed · "+selected.size+" selected";
+ groups.querySelectorAll("[data-integration]").forEach(input=>input.addEventListener("change",()=>{
+  const ids=new Set(selectedIntegrations());
+  if(input.checked)ids.add(input.dataset.integration);else ids.delete(input.dataset.integration);
+  saveIntegrationSelection([...ids]);renderIntegrations();
+ }));
+}
+async function loadIntegrations(){
+ const target=$("#integration-groups");
+ if(target)target.innerHTML='<div class="empty-state">Loading the latest API connection catalogue…</div>';
+ try{
+  const data=await request("/v1/integrations/catalog");
+  integrationCatalog=Array.isArray(data.integrations)?data.integrations:[];
+  renderIntegrations();
+ }catch(error){
+  if(target)target.innerHTML='<div class="empty-state">Could not load the API catalogue: '+esc(error.message)+'. Check that the backend deployment includes the integration catalogue update.</div>';
+  const count=$("#integration-count");if(count)count.textContent="Catalogue unavailable";
+ }
+}
+function setAllIntegrations(enabled){
+ const ids=enabled?integrationCatalog.map(item=>item.id):[];
+ saveIntegrationSelection(ids);renderIntegrations();
+}
+$("#select-all-integrations")?.addEventListener("click",()=>setAllIntegrations(true));
+$("#clear-integrations")?.addEventListener("click",()=>setAllIntegrations(false));
+$("#refresh-integrations")?.addEventListener("click",loadIntegrations);
+
 // Theme: light is the default; users can switch to dark and the choice persists on this device.
 const themeToggle=$("#theme-toggle");
 function applyTheme(theme){
@@ -48,7 +98,7 @@ let savedTheme="light";
 try{savedTheme=localStorage.getItem("sarafadeen.theme")||"light"}catch{}
 applyTheme(savedTheme);
 themeToggle?.addEventListener("click",()=>applyTheme(document.documentElement.getAttribute("data-ephinta-theme")==="dark"?"light":"dark"));
-function navigate(view){document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id==="view-"+view));document.querySelectorAll(".nav-link").forEach(x=>x.classList.toggle("active",x.dataset.view===view));$("#crumb-current").textContent=view.toUpperCase();history.replaceState(null,"","#"+view);$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show");if(view==="field")renderLocal()}
+function navigate(view){document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id==="view-"+view));document.querySelectorAll(".nav-link").forEach(x=>x.classList.toggle("active",x.dataset.view===view));$("#crumb-current").textContent=view.toUpperCase();history.replaceState(null,"","#"+view);$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show");if(view==="field")renderLocal();if(view==="integrations")loadIntegrations()}
 document.querySelectorAll("[data-view]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();navigate(a.dataset.view)}));document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.go)));
 $("#menu-btn").addEventListener("click",()=>{$("#sidebar").classList.add("open");$("#scrim").classList.add("show")});$("#scrim").addEventListener("click",()=>{$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show")});
 $("#refresh-updates").addEventListener("click",loadAll);
@@ -58,5 +108,5 @@ const KEY="camptech.fieldReports.v1";function localRows(){try{return JSON.parse(
 function renderLocal(){const rows=localRows();$("#local-reports").innerHTML=rows.length?rows.map(x=>'<article class="record"><div class="record-meta">'+esc(x.category)+' · '+esc(date(x.createdAt))+'</div><h3>'+esc(x.lga)+(x.ward?" · "+esc(x.ward):"")+'</h3><p>'+esc(x.description)+'</p>'+(x.sourceUrl?'<a href="'+esc(x.sourceUrl)+'" target="_blank" rel="noopener noreferrer">Supporting source ↗</a>':"")+'<p><span class="badge">LOCAL DRAFT · NOT SUBMITTED</span></p></article>').join(""):'<div class="empty-state">No local drafts saved on this device.</div>'}
 $("#field-form").addEventListener("submit",e=>{e.preventDefault();const f=new FormData(e.currentTarget);const rows=localRows();rows.unshift({category:f.get("category"),lga:f.get("lga"),ward:f.get("ward"),description:f.get("description"),sourceUrl:f.get("sourceUrl"),createdAt:new Date().toISOString()});try{localStorage.setItem(KEY,JSON.stringify(rows.slice(0,100)));e.currentTarget.reset();$("#field-feedback").textContent="Draft saved in this browser only. It has NOT been sent to the team or server.";renderLocal()}catch{$("#field-feedback").textContent="Could not save locally. Check browser storage availability."}});
 $("#clear-reports").addEventListener("click",()=>{if(confirm("Delete all field-report drafts saved on this device?")){localStorage.removeItem(KEY);renderLocal()}});
-const hash=location.hash.replace("#","");if(["updates","monitoring","operations","field"].includes(hash))navigate(hash);loadAll();renderLocal();loadHashtag();monitorTimer=setInterval(loadHashtag,5000);
+const hash=location.hash.replace("#","");if(["updates","monitoring","operations","field","integrations"].includes(hash))navigate(hash);loadAll();renderLocal();loadHashtag();loadIntegrations();monitorTimer=setInterval(loadHashtag,5000);
 })();
