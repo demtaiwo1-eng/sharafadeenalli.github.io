@@ -95,7 +95,36 @@ async function loadHashtag(){
 }
 
 
-const INTEGRATION_SELECTION_KEY="sarafadeen.integrationSelection.v1";
+async function enableNotifications(){
+ const button=$("#enable-notifications"), status=$("#notification-status");
+ if(!("serviceWorker" in navigator)||!("PushManager" in window)||!("Notification" in window)){if(status)status.textContent="Push notifications are not supported in this browser.";return}
+ if(Notification.permission==="denied"){if(status)status.textContent="Notifications are blocked in browser settings. Allow them there, then try again.";return}
+ try{
+  if(status)status.textContent="Requesting notification permission…";
+  const permission=await Notification.requestPermission();
+  if(permission!=="granted"){if(status)status.textContent="Notification permission was not granted.";return}
+  const registration=await navigator.serviceWorker.register("./sw.js");
+  const keyData=await request("/v1/notifications/public-key");
+  const decode=value=>Uint8Array.from(atob(value.replace(/-/g,"+").replace(/_/g,"/")),c=>c.charCodeAt(0));
+  let subscription=await registration.pushManager.getSubscription();
+  if(!subscription)subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:decode(keyData.publicKey)});
+  const response=await fetch(API+"/v1/notifications/subscribe",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({subscription:subscription.toJSON()})});
+  if(!response.ok)throw new Error("Notification service returned "+response.status);
+  if(status)status.textContent="Notifications enabled on this device.";
+  if(button)button.textContent="Disable notifications";
+ }catch(error){if(status)status.textContent="Could not enable notifications: "+error.message}
+}
+async function disableNotifications(){
+ const status=$("#notification-status"),button=$("#enable-notifications");
+ try{
+  const registration=await navigator.serviceWorker.getRegistration("./");
+  const subscription=await registration?.pushManager.getSubscription();
+  if(subscription){await fetch(API+"/v1/notifications/unsubscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({endpoint:subscription.endpoint})});await subscription.unsubscribe()}
+  if(status)status.textContent="Notifications disabled on this device.";
+  if(button)button.textContent="Enable notifications";
+ }catch(error){if(status)status.textContent="Could not disable notifications: "+error.message}
+}
+\nconst INTEGRATION_SELECTION_KEY="sarafadeen.integrationSelection.v1";
 let integrationCatalog=[];
 function selectedIntegrations(){try{return JSON.parse(localStorage.getItem(INTEGRATION_SELECTION_KEY)||"[]")}catch{return []}}
 function saveIntegrationSelection(ids){try{localStorage.setItem(INTEGRATION_SELECTION_KEY,JSON.stringify(ids))}catch{}}
@@ -163,7 +192,7 @@ applyTheme(savedTheme);
 themeToggle?.addEventListener("click",()=>applyTheme(document.documentElement.getAttribute("data-ephinta-theme")==="dark"?"light":"dark"));
 function navigate(view){document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id==="view-"+view));document.querySelectorAll(".nav-link").forEach(x=>x.classList.toggle("active",x.dataset.view===view));$("#crumb-current").textContent=view.toUpperCase();history.replaceState(null,"","#"+view);$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show");if(view==="field")renderLocal();if(view==="integrations")loadIntegrations()}
 document.querySelectorAll("[data-report]").forEach(b=>b.addEventListener("click",()=>loadDiscourseAnalytics(b.dataset.report)));
-$("#refresh-coverage")?.addEventListener("click",loadProviderCoverage);
+$("#refresh-coverage")?.addEventListener("click",loadProviderCoverage);\n$("#enable-notifications")?.addEventListener("click",()=>Notification.permission==="granted"?disableNotifications():enableNotifications());
 document.querySelectorAll("[data-view]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();navigate(a.dataset.view)}));document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.go)));
 $("#menu-btn").addEventListener("click",()=>{$("#sidebar").classList.add("open");$("#scrim").classList.add("show")});$("#scrim").addEventListener("click",()=>{$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show")});
 $("#refresh-updates").addEventListener("click",loadAll);
