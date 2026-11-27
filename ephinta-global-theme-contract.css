@@ -1,0 +1,146 @@
+/*
+ * EPHINTA GLOBAL THEME CONTRACT
+ * Shared semantic palette and typography tokens. Feature components own their surfaces,
+ * gradients and brand accents; the global layer must not flatten them.
+ */
+:root {
+  color-scheme: light;
+  --epg-page: #f6f7fc;
+  --epg-surface: #ffffff;
+  --epg-surface-raised: #ffffff;
+  --epg-surface-soft: #eef1fa;
+  --epg-ink: #17152b;
+  --epg-muted: #4b5268;
+  --epg-subtle: #626b82;
+  --epg-border: #d7dbea;
+  --epg-link: #4b35b5;
+  --epg-focus: #075fcc;
+  --epg-accent: #5b35d5;
+  --epg-accent-ink: #ffffff;
+  --epg-success: #176b42;
+  --epg-warning: #8a4b00;
+  --epg-danger: #a51f35;
+  --epg-shadow: 0 12px 32px rgb(25 28 55 / 9%);
+  --epg-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --epg-font-display: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --epg-text-xs: .75rem;
+  --epg-text-sm: .875rem;
+  --epg-text-base: 1rem;
+  --epg-text-lg: 1.125rem;
+  --epg-heading-1: clamp(1.9rem, 3.8vw, 3rem);
+  --epg-heading-2: clamp(1.5rem, 2.6vw, 2.1rem);
+  --epg-heading-3: 1.25rem;
+  --epg-heading-4: 1.125rem;
+  --epg-leading-tight: 1.2;
+  --epg-leading-body: 1.55;
+  --epg-weight-normal: 400;
+  --epg-weight-medium: 500;
+  --epg-weight-semibold: 600;
+  --epg-weight-bold: 700;
+  --epg-weight-heavy: 800;
+  --font-display: var(--epg-font-display);
+  --font-interface: var(--epg-font-body);
+  --eph-parent-font: var(--epg-font-body);
+}
+html[data-ephinta-theme="light"],html[data-theme="light"],html.theme-light,.theme-light {
+  color-scheme:light;
+  --epg-page:#f5f7fb; --epg-surface:#ffffff; --epg-surface-raised:#f8f9fc; --epg-surface-soft:#edf1f7;
+  --epg-ink:#000000; --epg-muted:#202020; --epg-subtle:#333333; --epg-border:#d5dce8;
+  --epg-link:#24108f; --epg-focus:#155eef; --epg-accent:#5145c6; --epg-accent-ink:#ffffff;
+  --epg-success:#176b48; --epg-warning:#805000; --epg-danger:#a51f35;
+  --epg-shadow:0 8px 24px rgb(23 32 51 / 8%);
+}
+html[data-ephinta-theme="dark"],html[data-theme="dark"],html.theme-dark,.theme-dark {
+  color-scheme:dark;
+  --epg-page:#0b1220; --epg-surface:#121d30; --epg-surface-raised:#1a2940; --epg-surface-soft:#22344e;
+  --epg-ink:#f7f9ff; --epg-muted:#e0e8f7; --epg-subtle:#cbd8ee; --epg-border:#526581;
+  --epg-link:#a9e7ff; --epg-focus:#ffe18a; --epg-accent:#c4b5fd; --epg-accent-ink:#17122b;
+  --epg-success:#9cf2c4; --epg-warning:#ffe09a; --epg-danger:#ffb4c0;
+  --epg-shadow:0 12px 30px rgb(0 0 0 / 32%);
+}
+html[data-ephinta-theme="colorful"],html[data-theme="colorful"],html.theme-colorful,.theme-colorful {
+  color-scheme: light;
+  --epg-page:#fff5fb; --epg-surface:#ffffff; --epg-surface-raised:#fffafd; --epg-surface-soft:#f3eaff;
+  --epg-ink:#24143a; --epg-muted:#49345f; --epg-subtle:#5b4770; --epg-border:#ddc9ed;
+  --epg-link:#5630a8; --epg-focus:#6d28d9; --epg-accent:#8b45c7; --epg-accent-ink:#ffffff;
+  --epg-success:#176b48; --epg-warning:#805000; --epg-danger:#a51f35;
+  --epg-shadow:0 12px 30px rgb(70 35 95 / 12%);
+}
+
+/* Compatibility tokens point to the selected palette, not to a second theme. */
+html[data-ephinta-theme],html[data-theme],html.theme-light,html.theme-dark,html.theme-colorful {
+  --ephinta-theme-page:var(--epg-page); --ephinta-theme-surface:var(--epg-surface);
+  --ephinta-theme-surface-soft:var(--epg-surface-raised); --ephinta-theme-ink:var(--epg-ink);
+  --ephinta-theme-muted:var(--epg-muted); --ephinta-theme-placeholder:var(--epg-subtle);
+  --ephinta-theme-border:var(--epg-border); --ephinta-theme-link:var(--epg-link);
+  --ephinta-theme-focus:var(--epg-focus); --ephinta-theme-accent:var(--epg-accent);
+  --ephinta-theme-primary-bg:var(--epg-accent); --ephinta-theme-primary-ink:var(--epg-accent-ink);
+  --ess-bg:var(--epg-page); --ess-bg-2:var(--epg-surface-soft);
+  --ess-surface:var(--epg-surface); --ess-surface-soft:var(--epg-surface-raised);
+  --ess-ink:var(--epg-ink); --ess-ink-soft:var(--epg-muted); --ess-mute:var(--epg-muted);
+  --ess-line:var(--epg-border); --ess-line-strong:var(--epg-border);
+  --eph-parent-bg:var(--epg-page); --eph-parent-bg-soft:var(--epg-surface-soft);
+  --eph-parent-surface:var(--epg-surface); --eph-parent-surface-muted:var(--epg-surface-raised);
+  --eph-parent-ink:var(--epg-ink); --eph-parent-muted:var(--epg-muted);
+  --eph-parent-border:var(--epg-border); --eph-parent-primary:var(--epg-accent);
+  --eph-parent-primary-hover:var(--epg-link); --eph-parent-secondary:var(--epg-link);
+  --font-display:var(--epg-font-display); --font-interface:var(--epg-font-body);
+  --eph-parent-font:var(--epg-font-body);
+  --text-primary:var(--epg-ink); --text-secondary:var(--epg-muted); --text-muted:var(--epg-subtle);
+  --color-text:var(--epg-ink); --color-text-secondary:var(--epg-muted); --link-color:var(--epg-link);
+  --primary-color:var(--epg-accent); --accent-color:var(--epg-accent); --border-color:var(--epg-border);
+  --ep-text:var(--epg-ink); --ep-muted:var(--epg-muted); --ep-link:var(--epg-link);
+  --ep-surface:var(--epg-surface); --ep-border:var(--epg-border);
+  --app-bg:var(--epg-page); --surface:var(--epg-surface); --text:var(--epg-ink);
+  --muted:var(--epg-muted); --border:var(--epg-border);
+}
+
+html,body,#root { color:var(--epg-ink); background-color:var(--epg-page); }
+body { color-scheme:inherit; }
+:where(.workspace-shell,.page-title,.dashboard-title) { color:var(--epg-ink); }
+:where(.workspace-subtitle,.workspace-card>p) { color:var(--epg-muted); }
+
+/* Native form fields and primary actions use the selected palette. Cards and
+   feature surfaces are intentionally excluded so multicolour designs survive. */
+:where(input,select,textarea,option) {
+  color:var(--epg-ink);
+  background-color:var(--epg-surface-raised);
+  border-color:var(--epg-border);
+  accent-color:var(--epg-accent);
+}
+:where(input,textarea)::placeholder { color:var(--epg-subtle); opacity:1; }
+:where(button,.button,[role="button"],.primary-button,.continue-action,.select-listing,
+.ess-primary,.pl-btn-primary,.pl-primary,.esg-btn.p) { accent-color:var(--epg-accent); }
+:where(.primary-button,.continue-action,.select-listing,.ess-primary,
+.pl-btn-primary,.pl-primary,.esg-btn.p) {
+  color:var(--epg-accent-ink);
+  background:var(--epg-accent);
+  border-color:var(--epg-accent);
+}
+:where(a,.text-action,.back-button) { color:var(--epg-link); }
+:where(table,th,td,.detail-list li,.event-row,.vendor-metric-row,.budget-row) { border-color:var(--epg-border); }
+
+/* Brand panels retain contrast through the same semantic light palette. */
+:where(.workspace-intro,.vendor-hero-card,.ess-sidebar,.app-sidebar,
+.dashboard-sidebar,.sidebar,.pl-footer,.esg-footer,.hero-dark,.dark-panel) {
+  color:var(--epg-ink);
+  background-color:var(--epg-surface);
+}
+:where(.workspace-intro,.vendor-hero-card,.ess-sidebar,.app-sidebar,
+.dashboard-sidebar,.sidebar,.pl-footer,.esg-footer,.hero-dark,.dark-panel)
+:where(h1,h2,h3,h4,strong,b,p,span,small,label,a,li) { color:inherit; }
+
+:where(button,a,input,select,textarea,[tabindex]):focus-visible {
+  outline:3px solid var(--epg-focus);
+  outline-offset:3px;
+}
+::selection { color:var(--epg-ink); background:var(--epg-surface-soft); }
+
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after {
+    scroll-behavior:auto !important;
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+  }
+}
