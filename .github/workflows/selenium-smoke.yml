@@ -40,6 +40,9 @@ jobs:
           try:
               driver.get("http://127.0.0.1:8000/")
               WebDriverWait(driver, 20).until(lambda d: d.find_element(By.ID, "enable-notifications").is_displayed())
+              WebDriverWait(driver, 10).until(lambda d: d.find_element(By.ID, "oauth-account-title").is_displayed())
+              assert driver.find_element(By.ID, "oauth-admin-token").get_attribute("type") == "password"
+              assert driver.find_element(By.ID, "oauth-unlock").is_displayed()
               assert "Sarafadeen" in driver.title
               driver.find_element(By.ID, "enable-notifications").click()
               registration = driver.execute_async_script("""
@@ -48,7 +51,7 @@ jobs:
                   .then(() => done(true)).catch(() => done(false));
               """)
               assert registration, "Service worker was not registered"
-              print("Dashboard loaded and notification service worker registered.")
+              print("Dashboard, secure OAuth account centre, and notification service worker loaded.")
           finally:
               driver.quit()
           PY
