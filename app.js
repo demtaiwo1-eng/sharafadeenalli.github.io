@@ -227,11 +227,18 @@ $("#oauth-unlock")?.addEventListener("click",async()=>{
  oauthAdminToken=value.trim();$("#oauth-admin-token").value="";
  await loadOAuthConnections();
 });
+window.addEventListener("message",event=>{
+ if(event.origin!==location.origin||event.data?.type!=="sarafadeen-oauth-complete")return;
+ const provider=oauthLabels[event.data.provider]||event.data.provider||"platform";
+ $("#oauth-status").textContent=event.data.status==="connected"?"Authorization completed for "+provider+".": "Authorization did not complete for "+provider+".";
+ if(oauthAdminToken)loadOAuthConnections();
+});
 const oauthResult=new URLSearchParams(location.search);
 if(oauthResult.get("oauth")){
  const provider=oauthLabels[oauthResult.get("provider")]||oauthResult.get("provider")||"platform";
  const status=oauthResult.get("oauth")==="connected"?"Authorization completed for "+provider+". Unlock the connection centre to confirm the saved connection.":"Authorization did not complete: "+(oauthResult.get("reason")||"provider declined or access expired")+".";
  sessionStorage.setItem("sarafadeen.oauth.notice",status);
+ try{if(window.opener&&!window.opener.closed)window.opener.postMessage({type:"sarafadeen-oauth-complete",status:oauthResult.get("oauth"),provider:oauthResult.get("provider")},location.origin);}catch{}
  history.replaceState(null,"",location.pathname+"#integrations");
 }
 try{const notice=sessionStorage.getItem("sarafadeen.oauth.notice");if(notice){const status=$("#oauth-status");if(status)status.textContent=notice;sessionStorage.removeItem("sarafadeen.oauth.notice");}}catch{}
