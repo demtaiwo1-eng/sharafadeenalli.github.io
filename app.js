@@ -192,7 +192,7 @@ function renderOAuthProviders(providers){
   const state=p.connected?'<span class="oauth-state connected">Connected</span>':p.configured?'<span class="oauth-state ready">Ready to sign in</span>':'<span class="oauth-state setup">Setup required</span>';
   const action=p.connected?'<button class="btn secondary" data-oauth-disconnect="'+esc(p.id)+'" type="button">Disconnect</button>':
    '<button class="btn primary" data-oauth-connect="'+esc(p.id)+'" type="button" '+(!p.configured?'disabled':'')+'>Connect account</button>';
-  return '<article class="oauth-provider-card"><div class="oauth-provider-top"><strong>'+esc(p.label)+'</strong>'+state+'</div><p>'+esc(p.note||"Official provider authorization")+'</p><small>Requested: '+esc((p.scopes||[]).join(", "))+'</small><div class="oauth-provider-action">'+action+'</div></article>';
+  return '<article class="oauth-provider-card"><div class="oauth-provider-top"><strong>'+esc(p.label)+'</strong>'+state+'</div><p>'+esc(p.note||"Official provider authorization")+'</p><small>Requested: '+esc((p.scopes||[]).join(", "))+'</small>'+(p.developerUrl?'<a class="oauth-developer-link" href="'+esc(p.developerUrl)+'" target="_blank" rel="noopener noreferrer">Developer app setup ↗</a>':'')+'<div class="oauth-provider-action">'+action+'</div></article>';
  }).join("");
  target.querySelectorAll("[data-oauth-connect]").forEach(button=>button.addEventListener("click",async()=>{
   button.disabled=true;button.textContent="Opening sign-in…";
