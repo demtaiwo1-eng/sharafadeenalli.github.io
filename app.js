@@ -196,8 +196,15 @@ function renderOAuthProviders(providers){
  }).join("");
  target.querySelectorAll("[data-oauth-connect]").forEach(button=>button.addEventListener("click",async()=>{
   button.disabled=true;button.textContent="Opening sign-in…";
-  try{const result=await oauthRequest("/v1/auth/connect/"+encodeURIComponent(button.dataset.oauthConnect),{method:"POST",headers:{}});window.location.assign(result.authorizationUrl);}
-  catch(error){$("#oauth-status").textContent=error.message;button.disabled=false;button.textContent="Connect account";}
+  const authWindow=window.open("about:blank","_blank");
+  try{
+   const result=await oauthRequest("/v1/auth/connect/"+encodeURIComponent(button.dataset.oauthConnect),{method:"POST"});
+   if(authWindow&&!authWindow.closed)authWindow.location.replace(result.authorizationUrl);
+   else window.location.assign(result.authorizationUrl);
+  }catch(error){
+   if(authWindow&&!authWindow.closed)authWindow.close();
+   $("#oauth-status").textContent=error.message;button.disabled=false;button.textContent="Connect account";
+  }
  }));
  target.querySelectorAll("[data-oauth-disconnect]").forEach(button=>button.addEventListener("click",async()=>{
   if(!confirm("Disconnect "+(oauthLabels[button.dataset.oauthDisconnect]||button.dataset.oauthDisconnect)+" from this monitoring service?"))return;
