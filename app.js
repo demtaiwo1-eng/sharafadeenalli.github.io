@@ -174,6 +174,61 @@ $("#select-all-integrations")?.addEventListener("click",()=>setAllIntegrations(t
 $("#clear-integrations")?.addEventListener("click",()=>setAllIntegrations(false));
 $("#refresh-integrations")?.addEventListener("click",loadIntegrations);
 
+
+// Secure social-account OAuth controls. The administrator token is memory-only.
+let oauthAdminToken="";
+const oauthLabels={x:"X",reddit:"Reddit",youtube:"YouTube / Google",facebook:"Facebook",instagram:"Instagram",threads:"Threads",tiktok:"TikTok",linkedin:"LinkedIn",mastodon:"Mastodon"};
+async function oauthRequest(path,options={}){
+ if(!oauthAdminToken)throw new Error("Unlock account connections first.");
+ const headers={Accept:"application/json",Authorization:"Bearer "+oauthAdminToken,...(options.body?{"Content-Type":"application/json"}:{})};
+ const response=await fetch(API+path,{...options,headers,credentials:"omit"});
+ const data=await response.json().catch(()=>({}));
+ if(!response.ok)throw new Error(data.error||"Authorization service returned "+response.status);
+ return data;
+}
+function renderOAuthProviders(providers){
+ const target=$("#oauth-provider-grid");if(!target)return;
+ target.innerHTML=providers.map(p=>{
+  const state=p.connected?'<span class="oauth-state connected">Connected</span>':p.configured?'<span class="oauth-state ready">Ready to sign in</span>':'<span class="oauth-state setup">Setup required</span>';
+  const action=p.connected?'<button class="btn secondary" data-oauth-disconnect="'+esc(p.id)+'" type="button">Disconnect</button>':
+   '<button class="btn primary" data-oauth-connect="'+esc(p.id)+'" type="button" '+(!p.configured?'disabled':'')+'>Connect account</button>';
+  return '<article class="oauth-provider-card"><div class="oauth-provider-top"><strong>'+esc(p.label)+'</strong>'+state+'</div><p>'+esc(p.note||"Official provider authorization")+'</p><small>Requested: '+esc((p.scopes||[]).join(", "))+'</small><div class="oauth-provider-action">'+action+'</div></article>';
+ }).join("");
+ target.querySelectorAll("[data-oauth-connect]").forEach(button=>button.addEventListener("click",async()=>{
+  button.disabled=true;button.textContent="Opening sign-in…";
+  try{const result=await oauthRequest("/v1/auth/connect/"+encodeURIComponent(button.dataset.oauthConnect),{method:"POST",headers:{}});window.location.assign(result.authorizationUrl);}
+  catch(error){$("#oauth-status").textContent=error.message;button.disabled=false;button.textContent="Connect account";}
+ }));
+ target.querySelectorAll("[data-oauth-disconnect]").forEach(button=>button.addEventListener("click",async()=>{
+  if(!confirm("Disconnect "+(oauthLabels[button.dataset.oauthDisconnect]||button.dataset.oauthDisconnect)+" from this monitoring service?"))return;
+  button.disabled=true;
+  try{await oauthRequest("/v1/auth/connections/"+encodeURIComponent(button.dataset.oauthDisconnect),{method:"DELETE"});await loadOAuthConnections();}
+  catch(error){$("#oauth-status").textContent=error.message;button.disabled=false;}
+ }));
+}
+async function loadOAuthConnections(){
+ const target=$("#oauth-provider-grid");if(target)target.innerHTML='<div class="empty-state">Checking secure account connections…</div>';
+ try{
+  const data=await oauthRequest("/v1/auth/connections");
+  renderOAuthProviders(data.providers||[]);
+  $("#oauth-status").textContent="Connection manager unlocked. "+(data.providers||[]).filter(x=>x.connected).length+" account connections currently stored.";
+ }catch(error){if(target)target.innerHTML='<div class="empty-state">'+esc(error.message)+'</div>';$("#oauth-status").textContent=error.message;}
+}
+$("#oauth-unlock")?.addEventListener("click",async()=>{
+ const value=$("#oauth-admin-token")?.value||"";
+ if(!value.trim()){ $("#oauth-status").textContent="Enter your administrator token to continue.";return;}
+ oauthAdminToken=value.trim();$("#oauth-admin-token").value="";
+ await loadOAuthConnections();
+});
+const oauthResult=new URLSearchParams(location.search);
+if(oauthResult.get("oauth")){
+ const provider=oauthLabels[oauthResult.get("provider")]||oauthResult.get("provider")||"platform";
+ const status=oauthResult.get("oauth")==="connected"?"Authorization completed for "+provider+". Unlock the connection centre to confirm the saved connection.":"Authorization did not complete: "+(oauthResult.get("reason")||"provider declined or access expired")+".";
+ sessionStorage.setItem("sarafadeen.oauth.notice",status);
+ history.replaceState(null,"",location.pathname+"#integrations");
+}
+try{const notice=sessionStorage.getItem("sarafadeen.oauth.notice");if(notice){const status=$("#oauth-status");if(status)status.textContent=notice;sessionStorage.removeItem("sarafadeen.oauth.notice");}}catch{}
+
 // Theme: light is the default; users can switch to dark and the choice persists on this device.
 const themeToggle=$("#theme-toggle");
 function applyTheme(theme){
