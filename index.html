@@ -51,6 +51,18 @@
 <section class="view" id="view-operations"><div class="page-heading"><div class="eyebrow">DELIVERY MANAGEMENT</div><h1>Operations</h1><p>Project visibility and coordination. Private records require authenticated team access in the production API.</p></div><div id="projects-list" class="record-list"><div class="empty-state">Loading projects…</div></div></section>
 <section class="view" id="view-integrations">
 <div class="page-heading"><div class="eyebrow">SOURCE CONNECTIVITY</div><h1>Platform API connections</h1><p>Assess available public-source integrations and choose which sources you want included in the monitoring plan. Credentials must be configured securely on the API service.</p></div>
+<section class="analytics-panel oauth-account-panel" aria-labelledby="oauth-account-title">
+ <div class="panel-head"><div><span class="eyebrow">SECURE ACCOUNT ACCESS</span><h2 id="oauth-account-title">Social account sign-in centre</h2></div><span class="badge">OAuth · encrypted storage</span></div>
+ <p class="map-note">Unlock with your administrator API token. The token stays in this page's memory only. Each platform opens its own official sign-in and consent page; provider access tokens are encrypted on the server. No passwords, one-time codes, browser profiles or raw social cookies are collected.</p>
+ <div class="oauth-unlock-row">
+  <label for="oauth-admin-token">Administrator access token</label>
+  <input id="oauth-admin-token" type="password" autocomplete="off" spellcheck="false" placeholder="Enter administrator token to manage connections">
+  <button class="btn primary" id="oauth-unlock" type="button">Unlock connections</button>
+ </div>
+ <p id="oauth-status" class="map-note" role="status" aria-live="polite">Account connections are locked until an administrator unlocks this page.</p>
+ <div id="oauth-provider-grid" class="oauth-provider-grid"><div class="empty-state">Unlock to check connected accounts.</div></div>
+ <p class="map-note">Some providers require a free developer app, approved permissions or API quota. X read access and some platform permissions may require paid entitlements or review; this application will not activate paid plans or bypass access restrictions.</p>
+</section>
 <div class="integration-toolbar"><div><strong id="integration-count">Loading connection catalogue…</strong><p class="muted">A selected source is a preference only. It becomes operational after its server-side credentials, permissions and collection adapter are configured and tested.</p></div><div class="integration-actions"><button class="btn secondary" id="select-all-integrations" type="button">Select all</button><button class="btn secondary" id="clear-integrations" type="button">Clear selection</button><button class="btn secondary" id="refresh-integrations" type="button">Refresh status</button></div></div>
 <div id="integration-groups" class="integration-groups"><div class="empty-state">Loading supported platforms…</div></div>
 <div class="integration-note"><strong>Security:</strong> Never paste API keys into this website or save them in browser storage. Add credentials as private environment variables in the Render API service. A green configured status means only that required variables exist; it does not prove the token works or that the platform has granted the required permissions.</div>
