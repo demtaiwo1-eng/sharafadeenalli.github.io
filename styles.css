@@ -116,3 +116,5 @@ html[data-ephinta-theme="colorful"] .module-state{color:var(--epg-link)}
 .oauth-state.setup{background:#fef3c7;color:#92400e}
 @media(max-width:900px){.oauth-provider-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.oauth-provider-grid{grid-template-columns:1fr}.oauth-unlock-row{grid-template-columns:1fr}.oauth-provider-card p{min-height:0}}
+
+.oauth-developer-link{display:inline-block;margin-top:7px;font-size:10px;font-weight:700;color:var(--epg-link);text-decoration:underline;text-underline-offset:3px}
